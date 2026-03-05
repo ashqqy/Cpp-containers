@@ -4,6 +4,7 @@
 #include <compare>
 #include <cstring>
 
+#include "iterator.hpp"
 #include "vector_bool.hpp"
 
 namespace containers

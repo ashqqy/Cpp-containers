@@ -17,9 +17,15 @@ inline std::size_t bits_to_bytes(std::size_t n_bits) noexcept
     return (n_bits + kBlockSize - 1) / kBlockSize;
 }
 
-inline std::size_t block_idx(std::size_t idx) noexcept { return idx / kBlockSize; }
+inline std::size_t block_idx(std::size_t idx) noexcept
+{
+    return idx / kBlockSize;
+}
 
-inline std::size_t offset_in_block(std::size_t idx) noexcept { return idx % kBlockSize; }
+inline std::size_t offset_in_block(std::size_t idx) noexcept
+{
+    return idx % kBlockSize;
+}
 
 inline std::byte get_bit_mask(std::size_t offset) noexcept
 {
@@ -40,10 +46,7 @@ class BitRef
 
     BitRef& operator=(bool value) noexcept
     {
-        if (value)
-        {
-            *block_ptr_ |= mask_;
-        }
+        if (value) { *block_ptr_ |= mask_; }
         else
         {
             *block_ptr_ &= ~mask_;
@@ -54,10 +57,7 @@ class BitRef
 
     BitRef& operator=(const BitRef& other) noexcept
     {
-        if (other)
-        {
-            *block_ptr_ |= mask_;
-        }
+        if (other) { *block_ptr_ |= mask_; }
         else
         {
             *block_ptr_ &= ~mask_;
@@ -129,10 +129,7 @@ class Vector<bool>
 
     Vector& operator=(Vector&& vector)
     {
-        if (this != std::addressof(vector))
-        {
-            swap(vector);
-        }
+        if (this != std::addressof(vector)) { swap(vector); }
 
         return *this;
     }
@@ -144,10 +141,7 @@ class Vector<bool>
         for (std::size_t i = 0; i < min_size; ++i)
         {
             std::strong_ordering cmp = (*this)[i] <=> other[i];
-            if (cmp != 0)
-            {
-                return cmp;
-            }
+            if (cmp != 0) { return cmp; }
         }
 
         return size_ <=> other.size_;
@@ -155,10 +149,7 @@ class Vector<bool>
 
     bool operator==(const Vector& other) const noexcept
     {
-        if (size() != other.size())
-        {
-            return false;
-        }
+        if (size() != other.size()) { return false; }
 
         return (*this <=> other) == 0;
     }
@@ -179,18 +170,12 @@ class Vector<bool>
 
     bool at(std::size_t idx) const
     {
-        if (idx >= size())
-        {
-            throw std::out_of_range("Vector::at");
-        }
+        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
         return (*this)[idx];
     }
     details::BitRef at(std::size_t idx)
     {
-        if (idx >= size())
-        {
-            throw std::out_of_range("Vector::at");
-        }
+        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
         return (*this)[idx];
     }
 
@@ -209,18 +194,12 @@ class Vector<bool>
 
     void reserve(std::size_t new_cap)
     {
-        if (new_cap > capacity())
-        {
-            reallocate_bool(new_cap);
-        }
+        if (new_cap > capacity()) { reallocate_bool(new_cap); }
     }
 
     void shrink_to_fit()
     {
-        if (capacity() > size())
-        {
-            reallocate_bool(size());
-        }
+        if (capacity() > size()) { reallocate_bool(size()); }
     }
 
   public: // modifiers
@@ -228,28 +207,19 @@ class Vector<bool>
 
     void push_back(bool value)
     {
-        if (size_out_of_range())
-        {
-            reallocate_bool(doubled_capacity());
-        }
+        if (size_out_of_range()) { reallocate_bool(doubled_capacity()); }
 
         set(size_++, value);
     }
 
     void pop_back() noexcept
     {
-        if (!empty())
-        {
-            --size_;
-        }
+        if (!empty()) { --size_; }
     }
 
     void resize(std::size_t new_size, bool value = false)
     {
-        if (new_size < size())
-        {
-            size_ = new_size;
-        }
+        if (new_size < size()) { size_ = new_size; }
         else if (new_size < capacity())
         {
             fill(value, size_, new_size);
@@ -297,10 +267,7 @@ class Vector<bool>
 
     void reallocate_bool(std::size_t new_cap)
     {
-        if (new_cap == capacity())
-        {
-            return;
-        }
+        if (new_cap == capacity()) { return; }
 
         std::byte* new_buffer = allocate_bool(new_cap);
 
@@ -317,10 +284,7 @@ class Vector<bool>
 
     void fill(bool value, std::size_t start_idx, std::size_t end_idx) noexcept
     {
-        if (start_idx > end_idx)
-        {
-            return;
-        }
+        if (start_idx > end_idx) { return; }
 
         for (std::size_t i = start_idx; i < end_idx; ++i)
         {
@@ -330,10 +294,7 @@ class Vector<bool>
 
     void copy(const bool* begin, const bool* end) noexcept
     {
-        if (begin > end)
-        {
-            return;
-        }
+        if (begin > end) { return; }
 
         for (std::size_t i = 0; i < size(); ++i)
         {
