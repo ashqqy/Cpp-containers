@@ -4,7 +4,11 @@ function(add_container_test TASK_NAME)
   set(TARGET_NAME "${TASK_NAME}-test")
   add_executable(${TARGET_NAME} tests.cpp)
 
-  target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/${TASK_NAME})
+    target_include_directories(${TARGET_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/tests
+    ${CMAKE_SOURCE_DIR}/tests/${TASK_NAME}
+    ${CMAKE_SOURCE_DIR}/${TASK_NAME}
+  )
 
   target_link_libraries(${TARGET_NAME}
     ${GTEST_LIBRARIES}

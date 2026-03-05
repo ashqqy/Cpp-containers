@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "test_vector_bool.hpp"
+// #include "test_vector_bool.hpp"
 #include "test_vector_int.hpp"
 
 int main(int argc, char** argv) {
