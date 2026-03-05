@@ -3,15 +3,11 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <cstdint>
-#include <deque>
-#include <forward_list>
-#include <list>
-#include <ranges>
 #include <string>
-#include <vector>
+#include <type_traits>
 
 #include "signature.hpp"
+#include "types_for_test.hpp"
 
 template <typename T>
 using VectorT = signature::VectorT<T>;
@@ -47,10 +43,6 @@ template <typename T>
 class VectorMethods : public VectorTestEnvironment<T>
 {
 };
-
-using TestTypes = ::testing::Types<bool, int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t,
-                                   uint32_t, uint64_t, float, double, VectorT<int>, std::deque<int>,
-                                   std::list<int>, std::forward_list<int>>;
 
 // Run tests for all types in TestTypes
 TYPED_TEST_SUITE(VectorComparison, TestTypes);
