@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <vector>
-
 #include "signature.hpp"
 #include "common.hpp"
 
