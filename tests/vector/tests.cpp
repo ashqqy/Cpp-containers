@@ -6,6 +6,7 @@
 #include "test_vector_t.hpp"
 #include "test_throwing_methods.hpp"
 #include "test_throwing_type.hpp"
+#include "test_throwing_allocation.hpp"
 // clang-format on
 
 int main(int argc, char** argv) {
