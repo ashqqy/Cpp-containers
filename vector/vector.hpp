@@ -13,10 +13,16 @@ template <typename T>
 class Vector {
   public:
     using value_type = T;
+    using iterator = VectorIterator<T, false>;
+    using const_iterator = VectorIterator<T, true>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
   private:
     static constexpr std::size_t kCapacityMultiplier = 2;
     static constexpr std::size_t kMinCapacity = 1;
+
+    static constexpr const char* kAtExceptionMessage = "Vector::at";
 
   public: // constructors
     Vector() = default;
@@ -72,17 +78,34 @@ class Vector {
         return *this == other;
     }
 
+  public: // iterators
+    iterator begin() noexcept { return iterator(data()); }
+    iterator end() noexcept { return iterator(data() + size_); }
+    const_iterator begin() const noexcept { return const_iterator(data()); }
+    const_iterator end() const noexcept { return const_iterator(data() + size_); }
+
+    const_iterator cbegin() const noexcept { return begin(); }
+    const_iterator cend() const noexcept { return end(); }
+
+    reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
+    reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
+    const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(end()); }
+    const_reverse_iterator rend() const noexcept { return const_reverse_iterator(begin()); }
+
+    const_reverse_iterator crbegin() const noexcept { return rbegin(); }
+    const_reverse_iterator crend() const noexcept { return rend(); }
+
   public: // element access
     value_type& operator[](std::size_t idx) noexcept { return buffer_[idx]; }
 
     const value_type& operator[](std::size_t idx) const noexcept { return buffer_[idx]; }
 
     value_type& at(std::size_t idx) {
-        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
+        if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
         return buffer_[idx];
     }
     const value_type& at(std::size_t idx) const {
-        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
+        if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
         return buffer_[idx];
     }
 
@@ -123,7 +146,7 @@ class Vector {
             return;
         }
 
-        (*this)[size_] = value;
+        (*this)[size()] = value;
         ++size_;
     }
 
@@ -208,6 +231,7 @@ class Vector {
 
     static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end) {
         T* result = allocate(end - begin);
+
         try {
             copy(begin, end, result);
         } catch (...) {
