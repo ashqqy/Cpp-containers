@@ -14,6 +14,6 @@ function(add_container_test TASK_NAME)
     ${GTEST_LIBRARIES}
   )
 
-  target_compile_options(${TARGET_NAME} PUBLIC ${COMPILE_OPT} -Wno-error=self-assign-overloaded)
-  target_link_options(${TARGET_NAME} PUBLIC ${LINK_OPT} -Wno-error=self-assign-overloaded)
+  target_compile_options(${TARGET_NAME} PUBLIC ${COMPILE_OPT} ${AdditionalCompileOptions})
+  target_link_options(${TARGET_NAME} PUBLIC ${LINK_OPT} ${AdditionalLinkOptions})
 endfunction()
