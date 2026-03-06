@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 if [ ! -d .git ]; then
     echo "Error: This is not a git repository" >&2
