@@ -2,8 +2,7 @@
 
 #include <vector.hpp>
 
-namespace signature
-{
+namespace signature {
 
 template <typename T>
 using VectorT = containers::Vector<T>;

@@ -13,8 +13,7 @@ template <typename T>
 using VectorT = signature::VectorT<T>;
 
 template <typename T>
-class VectorTestEnvironment : public ::testing::Test
-{
+class VectorTestEnvironment : public ::testing::Test {
   protected:
     const VectorT<T> empty_{};
     const VectorT<T> single_{T(1)};
@@ -25,24 +24,16 @@ class VectorTestEnvironment : public ::testing::Test
 };
 
 template <typename T>
-class VectorComparison : public VectorTestEnvironment<T>
-{
-};
+class VectorComparison : public VectorTestEnvironment<T> {};
 
 template <typename T>
-class VectorCopyAssignment : public VectorTestEnvironment<T>
-{
-};
+class VectorCopyAssignment : public VectorTestEnvironment<T> {};
 
 template <typename T>
-class VectorConstructors : public VectorTestEnvironment<T>
-{
-};
+class VectorConstructors : public VectorTestEnvironment<T> {};
 
 template <typename T>
-class VectorMethods : public VectorTestEnvironment<T>
-{
-};
+class VectorMethods : public VectorTestEnvironment<T> {};
 
 // Run tests for all types in TestTypes
 TYPED_TEST_SUITE(VectorComparison, TestTypes);
@@ -50,8 +41,7 @@ TYPED_TEST_SUITE(VectorCopyAssignment, TestTypes);
 TYPED_TEST_SUITE(VectorConstructors, TestTypes);
 TYPED_TEST_SUITE(VectorMethods, TestTypes);
 
-TYPED_TEST(VectorComparison, EqualityOperator)
-{
+TYPED_TEST(VectorComparison, EqualityOperator) {
     EXPECT_TRUE(this->empty_ == this->empty_);
     EXPECT_TRUE(this->single_ == this->single_);
     EXPECT_TRUE(this->ascending_ == this->ascending_);
@@ -61,14 +51,12 @@ TYPED_TEST(VectorComparison, EqualityOperator)
     EXPECT_FALSE(this->ascending_ == this->longer_);
     EXPECT_FALSE(this->single_ == this->same_values_);
 
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_FALSE(this->ascending_ == this->descending_);
     }
 }
 
-TYPED_TEST(VectorComparison, InequalityOperator)
-{
+TYPED_TEST(VectorComparison, InequalityOperator) {
     EXPECT_TRUE(this->empty_ != this->single_);
     EXPECT_TRUE(this->ascending_ != this->longer_);
     EXPECT_TRUE(this->single_ != this->same_values_);
@@ -78,22 +66,19 @@ TYPED_TEST(VectorComparison, InequalityOperator)
     EXPECT_FALSE(this->ascending_ != this->ascending_);
     EXPECT_FALSE(this->same_values_ != this->same_values_);
 
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_TRUE(this->ascending_ != this->descending_);
     }
 }
 
-TYPED_TEST(VectorComparison, LessThanOperator)
-{
+TYPED_TEST(VectorComparison, LessThanOperator) {
     EXPECT_TRUE(this->empty_ < this->single_);
     EXPECT_TRUE(this->empty_ < this->ascending_);
 
     EXPECT_TRUE(this->ascending_ < this->longer_);
     EXPECT_FALSE(this->longer_ < this->ascending_);
 
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_TRUE(this->ascending_ < this->descending_);
     }
     EXPECT_FALSE(this->descending_ < this->ascending_);
@@ -106,8 +91,7 @@ TYPED_TEST(VectorComparison, LessThanOperator)
     EXPECT_FALSE(this->same_values_ < short_same);
 }
 
-TYPED_TEST(VectorComparison, LessThanOrEqualOperator)
-{
+TYPED_TEST(VectorComparison, LessThanOrEqualOperator) {
     EXPECT_TRUE(this->empty_ <= this->single_);
     EXPECT_TRUE(this->ascending_ <= this->longer_);
     EXPECT_TRUE(this->ascending_ <= this->descending_);
@@ -118,22 +102,19 @@ TYPED_TEST(VectorComparison, LessThanOrEqualOperator)
 
     EXPECT_FALSE(this->single_ <= this->empty_);
     EXPECT_FALSE(this->longer_ <= this->ascending_);
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_FALSE(this->descending_ <= this->ascending_);
     }
 }
 
-TYPED_TEST(VectorComparison, GreaterThanOperator)
-{
+TYPED_TEST(VectorComparison, GreaterThanOperator) {
     EXPECT_TRUE(this->single_ > this->empty_);
     EXPECT_TRUE(this->ascending_ > this->empty_);
 
     EXPECT_TRUE(this->longer_ > this->ascending_);
     EXPECT_FALSE(this->ascending_ > this->longer_);
 
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_TRUE(this->descending_ > this->ascending_);
     }
     EXPECT_FALSE(this->ascending_ > this->descending_);
@@ -142,8 +123,7 @@ TYPED_TEST(VectorComparison, GreaterThanOperator)
     EXPECT_FALSE(this->same_values_ > this->same_values_);
 }
 
-TYPED_TEST(VectorComparison, GreaterThanOrEqualOperator)
-{
+TYPED_TEST(VectorComparison, GreaterThanOrEqualOperator) {
     EXPECT_TRUE(this->single_ >= this->empty_);
     EXPECT_TRUE(this->longer_ >= this->ascending_);
     EXPECT_TRUE(this->descending_ >= this->ascending_);
@@ -154,14 +134,12 @@ TYPED_TEST(VectorComparison, GreaterThanOrEqualOperator)
 
     EXPECT_FALSE(this->empty_ >= this->single_);
     EXPECT_FALSE(this->ascending_ >= this->longer_);
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_FALSE(this->ascending_ >= this->descending_);
     }
 }
 
-TEST(StringVectorComparisonTest, StringSpecificTests)
-{
+TEST(StringVectorComparisonTest, StringSpecificTests) {
     const VectorT<std::string> empty;
     const VectorT<std::string> a = {"a"};
     const VectorT<std::string> b = {"b"};
@@ -175,8 +153,7 @@ TEST(StringVectorComparisonTest, StringSpecificTests)
     EXPECT_TRUE(ab < ba);
 }
 
-TEST(NestedVectorComparisonTest, NestedVectorTests)
-{
+TEST(NestedVectorComparisonTest, NestedVectorTests) {
     const VectorT<VectorT<int>> empty;
     const VectorT<VectorT<int>> v1 = {{1, 2}, {3, 4}};
     const VectorT<VectorT<int>> v2 = {{1, 2}, {3, 5}};
@@ -188,13 +165,11 @@ TEST(NestedVectorComparisonTest, NestedVectorTests)
     EXPECT_FALSE(v3 < v1);
 }
 
-TYPED_TEST(VectorComparison, EdgeCases)
-{
+TYPED_TEST(VectorComparison, EdgeCases) {
     const VectorT<TypeParam> max_vec = {std::numeric_limits<TypeParam>::max()};
     const VectorT<TypeParam> kMinVec = {std::numeric_limits<TypeParam>::min()};
 
-    if constexpr (std::is_arithmetic_v<TypeParam>)
-    {
+    if constexpr (std::is_arithmetic_v<TypeParam>) {
         EXPECT_TRUE(kMinVec < max_vec);
         EXPECT_TRUE(max_vec > kMinVec);
     }
@@ -204,8 +179,7 @@ TYPED_TEST(VectorComparison, EdgeCases)
     const VectorT<TypeParam> long_vec_3(1000, TypeParam(2));
 
     EXPECT_TRUE(long_vec_1 == long_vec_2);
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         EXPECT_TRUE(long_vec_1 < long_vec_3);
         EXPECT_TRUE(long_vec_3 > long_vec_2);
     }
@@ -217,8 +191,7 @@ TYPED_TEST(VectorComparison, EdgeCases)
     EXPECT_TRUE(empty2 == this->empty_);
 }
 
-TYPED_TEST(VectorComparison, DifferentLengths)
-{
+TYPED_TEST(VectorComparison, DifferentLengths) {
     const VectorT<TypeParam> v1 = {TypeParam(1), TypeParam(2)};
     const VectorT<TypeParam> v2 = {TypeParam(1), TypeParam(2), TypeParam(3)};
     const VectorT<TypeParam> v3 = {TypeParam(1), TypeParam(3)};
@@ -230,8 +203,7 @@ TYPED_TEST(VectorComparison, DifferentLengths)
     EXPECT_FALSE(v3 < v1);
 }
 
-TYPED_TEST(VectorCopyAssignment, BasicUB)
-{
+TYPED_TEST(VectorCopyAssignment, BasicUB) {
     {
         VectorT<TypeParam> copy;
         copy = this->ascending_;
@@ -240,56 +212,49 @@ TYPED_TEST(VectorCopyAssignment, BasicUB)
     EXPECT_EQ(this->ascending_, (VectorT<TypeParam>{TypeParam(1), TypeParam(2), TypeParam(3)}));
 }
 
-TYPED_TEST(VectorCopyAssignment, SameSize)
-{
+TYPED_TEST(VectorCopyAssignment, SameSize) {
     VectorT<TypeParam> copy;
     copy = this->ascending_;
     EXPECT_TRUE(copy == this->ascending_);
     EXPECT_EQ(copy.size(), this->ascending_.size());
 }
 
-TYPED_TEST(VectorCopyAssignment, ToLarger)
-{
+TYPED_TEST(VectorCopyAssignment, ToLarger) {
     VectorT<TypeParam> copy = this->longer_;
     copy = this->single_;
     EXPECT_TRUE(copy == this->single_);
     EXPECT_EQ(copy.size(), this->single_.size());
 }
 
-TYPED_TEST(VectorCopyAssignment, ToSmaller)
-{
+TYPED_TEST(VectorCopyAssignment, ToSmaller) {
     VectorT<TypeParam> copy = this->single_;
     copy = this->longer_;
     EXPECT_TRUE(copy == this->longer_);
     EXPECT_EQ(copy.size(), this->longer_.size());
 }
 
-TYPED_TEST(VectorCopyAssignment, ToEmpty)
-{
+TYPED_TEST(VectorCopyAssignment, ToEmpty) {
     VectorT<TypeParam> copy;
     copy = this->ascending_;
     EXPECT_TRUE(copy == this->ascending_);
     EXPECT_EQ(copy.size(), this->ascending_.size());
 }
 
-TYPED_TEST(VectorCopyAssignment, FromEmpty)
-{
+TYPED_TEST(VectorCopyAssignment, FromEmpty) {
     VectorT<TypeParam> copy = this->ascending_;
     copy = this->empty_;
     EXPECT_TRUE(copy == this->empty_);
     EXPECT_TRUE(copy.empty());
 }
 
-TYPED_TEST(VectorCopyAssignment, Self)
-{
+TYPED_TEST(VectorCopyAssignment, Self) {
     VectorT<TypeParam> copy = this->ascending_;
     copy = copy;
     EXPECT_TRUE(copy == this->ascending_);
     EXPECT_EQ(copy.size(), this->ascending_.size());
 }
 
-TYPED_TEST(VectorCopyAssignment, Chain)
-{
+TYPED_TEST(VectorCopyAssignment, Chain) {
     VectorT<TypeParam> copy1, copy2;
     copy2 = copy1 = this->same_values_;
     EXPECT_TRUE(copy1 == this->same_values_);
@@ -297,66 +262,56 @@ TYPED_TEST(VectorCopyAssignment, Chain)
     EXPECT_TRUE(copy1 == copy2);
 }
 
-TYPED_TEST(VectorCopyAssignment, WithEmpty)
-{
+TYPED_TEST(VectorCopyAssignment, WithEmpty) {
     VectorT<TypeParam> empty;
     empty = this->empty_;
     EXPECT_TRUE(empty == this->empty_);
 }
 
-TYPED_TEST(VectorCopyAssignment, SelfWithEmpty)
-{
+TYPED_TEST(VectorCopyAssignment, SelfWithEmpty) {
     VectorT<TypeParam> empty;
     empty = empty;
     EXPECT_TRUE(empty == this->empty_);
 }
 
-TYPED_TEST(VectorConstructors, Default)
-{
+TYPED_TEST(VectorConstructors, Default) {
     VectorT<TypeParam> s;
     EXPECT_EQ(s.size(), 0UL);
     EXPECT_TRUE(s.empty());
 }
 
-TYPED_TEST(VectorConstructors, SizeConstructor)
-{
+TYPED_TEST(VectorConstructors, SizeConstructor) {
     const size_t size = 100;
     VectorT<TypeParam> s(size);
     EXPECT_EQ(s.size(), size);
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         EXPECT_EQ(s.at(i), TypeParam{});
     }
 }
 
-TYPED_TEST(VectorConstructors, SizeValue)
-{
+TYPED_TEST(VectorConstructors, SizeValue) {
     const size_t size = 100;
     TypeParam value = TypeParam(10);
     VectorT<TypeParam> s(size, value);
     EXPECT_EQ(s.size(), size);
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         EXPECT_EQ(s.at(i), value);
     }
 }
 
-TYPED_TEST(VectorConstructors, Copy)
-{
+TYPED_TEST(VectorConstructors, Copy) {
     const size_t size = 100;
     TypeParam value = TypeParam(10);
     VectorT<TypeParam> s(size, value);
     VectorT<TypeParam> s1(s);
 
     EXPECT_EQ(s.size(), s1.size());
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         EXPECT_EQ(s.at(i), s1.at(i));
     }
 }
 
-TYPED_TEST(VectorMethods, Clear)
-{
+TYPED_TEST(VectorMethods, Clear) {
     const size_t size = 100;
     TypeParam value = TypeParam(10);
     VectorT<TypeParam> s(size, value);
@@ -365,8 +320,7 @@ TYPED_TEST(VectorMethods, Clear)
     EXPECT_TRUE(s.empty());
 }
 
-TYPED_TEST(VectorMethods, PushBackToExisting)
-{
+TYPED_TEST(VectorMethods, PushBackToExisting) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1), TypeParam(2)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     s.push_back(TypeParam(4));
@@ -374,16 +328,14 @@ TYPED_TEST(VectorMethods, PushBackToExisting)
     EXPECT_EQ(s.back(), TypeParam(4));
 }
 
-TYPED_TEST(VectorMethods, PushBackToDefault)
-{
+TYPED_TEST(VectorMethods, PushBackToDefault) {
     VectorT<TypeParam> s;
     s.push_back(TypeParam(1));
     EXPECT_EQ(s.size(), 1UL);
     EXPECT_EQ(s.back(), TypeParam(1));
 }
 
-TYPED_TEST(VectorMethods, PopBackFromNonEmpty)
-{
+TYPED_TEST(VectorMethods, PopBackFromNonEmpty) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     s.pop_back();
@@ -394,8 +346,7 @@ TYPED_TEST(VectorMethods, PopBackFromNonEmpty)
     EXPECT_TRUE(s.empty());
 }
 
-TYPED_TEST(VectorMethods, ResizeToSmaller)
-{
+TYPED_TEST(VectorMethods, ResizeToSmaller) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1), TypeParam(2), TypeParam(3),
                        TypeParam(4), TypeParam(5), TypeParam(6)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
@@ -404,8 +355,7 @@ TYPED_TEST(VectorMethods, ResizeToSmaller)
     EXPECT_EQ(s.at(2), TypeParam(2));
 }
 
-TYPED_TEST(VectorMethods, ResizeToBigger)
-{
+TYPED_TEST(VectorMethods, ResizeToBigger) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     s.resize(10);
@@ -414,16 +364,14 @@ TYPED_TEST(VectorMethods, ResizeToBigger)
     EXPECT_EQ(s.at(1), TypeParam(1));
 }
 
-TYPED_TEST(VectorMethods, ResizeToZero)
-{
+TYPED_TEST(VectorMethods, ResizeToZero) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     s.resize(0);
     EXPECT_TRUE(s.empty());
 }
 
-TYPED_TEST(VectorMethods, ResizeToBiggerWithValue)
-{
+TYPED_TEST(VectorMethods, ResizeToBiggerWithValue) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     TypeParam value = TypeParam(20);
@@ -435,8 +383,7 @@ TYPED_TEST(VectorMethods, ResizeToBiggerWithValue)
     EXPECT_EQ(s.at(9), value);
 }
 
-TYPED_TEST(VectorMethods, ReserveToLess)
-{
+TYPED_TEST(VectorMethods, ReserveToLess) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1), TypeParam(2), TypeParam(3), TypeParam(4),
                        TypeParam(5), TypeParam(6), TypeParam(7), TypeParam(8), TypeParam(9)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
@@ -446,8 +393,7 @@ TYPED_TEST(VectorMethods, ReserveToLess)
     EXPECT_GE(s.capacity(), old_capacity);
 }
 
-TYPED_TEST(VectorMethods, ReserveToBigger)
-{
+TYPED_TEST(VectorMethods, ReserveToBigger) {
     TypeParam arr[] = {TypeParam(0), TypeParam(1), TypeParam(2), TypeParam(3), TypeParam(4),
                        TypeParam(5), TypeParam(6), TypeParam(7), TypeParam(8), TypeParam(9)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
@@ -456,8 +402,7 @@ TYPED_TEST(VectorMethods, ReserveToBigger)
     EXPECT_GE(s.capacity(), 100UL);
 }
 
-TYPED_TEST(VectorMethods, Swap)
-{
+TYPED_TEST(VectorMethods, Swap) {
     TypeParam arr[] = {TypeParam(0), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(0)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     TypeParam brr[] = {TypeParam(0), TypeParam(0), TypeParam(2), TypeParam(0), TypeParam(0)};
@@ -470,8 +415,7 @@ TYPED_TEST(VectorMethods, Swap)
     EXPECT_EQ(t.at(2), TypeParam(1));
 }
 
-TYPED_TEST(VectorMethods, SwapSelf)
-{
+TYPED_TEST(VectorMethods, SwapSelf) {
     TypeParam arr[] = {TypeParam(0), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(0)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
     s.swap(s);
@@ -479,13 +423,11 @@ TYPED_TEST(VectorMethods, SwapSelf)
     EXPECT_EQ(s.at(2), TypeParam(1));
 }
 
-TYPED_TEST(VectorMethods, AccessNonConst)
-{
+TYPED_TEST(VectorMethods, AccessNonConst) {
     TypeParam arr[] = {TypeParam(0), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(0)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
 
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         const bool is_ref_at = std::is_reference_v<decltype(s.at(0))>;
         const bool is_ref_op = std::is_reference_v<decltype(s[0])>;
         EXPECT_TRUE(is_ref_at);
@@ -498,8 +440,7 @@ TYPED_TEST(VectorMethods, AccessNonConst)
     EXPECT_EQ(s[0], TypeParam(10));
 }
 
-TYPED_TEST(VectorMethods, AccessConst)
-{
+TYPED_TEST(VectorMethods, AccessConst) {
     TypeParam arr[] = {TypeParam(0), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(0)};
     const VectorT<TypeParam> s(std::begin(arr), std::end(arr));
 
@@ -514,8 +455,7 @@ TYPED_TEST(VectorMethods, AccessConst)
     EXPECT_TRUE(is_const_ref_op || is_not_ref_op);
 }
 
-TYPED_TEST(VectorMethods, FrontBackConst)
-{
+TYPED_TEST(VectorMethods, FrontBackConst) {
     TypeParam arr[] = {TypeParam(10), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(20)};
     const VectorT<TypeParam> s(std::begin(arr), std::end(arr));
 
@@ -532,19 +472,16 @@ TYPED_TEST(VectorMethods, FrontBackConst)
     EXPECT_EQ(s.back(), TypeParam(20));
 }
 
-TYPED_TEST(VectorMethods, FrontBackNonConst)
-{
+TYPED_TEST(VectorMethods, FrontBackNonConst) {
     TypeParam arr[] = {TypeParam(10), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(20)};
     VectorT<TypeParam> s(std::begin(arr), std::end(arr));
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         bool is_ref = std::is_reference_v<decltype(s.front())>;
         EXPECT_TRUE(is_ref);
     }
     s.front() = TypeParam(15);
     EXPECT_EQ(s.at(0), TypeParam(15));
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         bool is_ref = std::is_reference_v<decltype(s.back())>;
         EXPECT_TRUE(is_ref);
     }
@@ -552,10 +489,8 @@ TYPED_TEST(VectorMethods, FrontBackNonConst)
     EXPECT_EQ(s.at(s.size() - 1), TypeParam(25));
 }
 
-TYPED_TEST(VectorMethods, DataNonConst)
-{
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+TYPED_TEST(VectorMethods, DataNonConst) {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         TypeParam arr[] = {TypeParam(10), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(20)};
         VectorT<TypeParam> s(std::begin(arr), std::end(arr));
 
@@ -565,10 +500,8 @@ TYPED_TEST(VectorMethods, DataNonConst)
     }
 }
 
-TYPED_TEST(VectorMethods, DataConst)
-{
-    if constexpr (!std::is_same_v<TypeParam, bool>)
-    {
+TYPED_TEST(VectorMethods, DataConst) {
+    if constexpr (!std::is_same_v<TypeParam, bool>) {
         TypeParam arr[] = {TypeParam(10), TypeParam(0), TypeParam(1), TypeParam(0), TypeParam(20)};
         const VectorT<TypeParam> s(std::begin(arr), std::end(arr));
 
@@ -578,15 +511,13 @@ TYPED_TEST(VectorMethods, DataConst)
     }
 }
 
-TYPED_TEST(VectorMethods, SizeCapacityUnsigned)
-{
+TYPED_TEST(VectorMethods, SizeCapacityUnsigned) {
     VectorT<TypeParam> s;
     EXPECT_TRUE(std::is_unsigned_v<decltype(s.size())>);
     EXPECT_TRUE(std::is_unsigned_v<decltype(s.capacity())>);
 }
 
-TEST(DeductionGuides, FromInitializerList)
-{
+TEST(DeductionGuides, FromInitializerList) {
     VectorT v{1, 2, 3, 4, 5};
 
     EXPECT_TRUE((std::is_same_v<decltype(v), VectorT<int>>));
@@ -595,20 +526,17 @@ TEST(DeductionGuides, FromInitializerList)
     EXPECT_EQ(v[4], 5);
 }
 
-TEST(DeductionGuides, FromSizeAndValue)
-{
+TEST(DeductionGuides, FromSizeAndValue) {
     VectorT v(5, 3.14);
 
     EXPECT_TRUE((std::is_same_v<decltype(v), VectorT<double>>));
     EXPECT_EQ(v.size(), 5UL);
-    for (size_t i = 0; i < v.size(); ++i)
-    {
+    for (size_t i = 0; i < v.size(); ++i) {
         EXPECT_DOUBLE_EQ(v[i], 3.14);
     }
 }
 
-TEST(DeductionGuides, CopyDeduction)
-{
+TEST(DeductionGuides, CopyDeduction) {
     VectorT<int> original{1, 2, 3};
 
     VectorT copy(original);
@@ -618,8 +546,7 @@ TEST(DeductionGuides, CopyDeduction)
     EXPECT_EQ(copy[0], 1);
 }
 
-TEST(DeductionGuides, WithCStrings)
-{
+TEST(DeductionGuides, WithCStrings) {
     VectorT v{"hello", "world"};
 
     EXPECT_TRUE((std::is_same_v<decltype(v), VectorT<const char*>>));
@@ -628,8 +555,7 @@ TEST(DeductionGuides, WithCStrings)
     EXPECT_STREQ(v[1], "world");
 }
 
-TEST(DeductionGuides, NestedVectors)
-{
+TEST(DeductionGuides, NestedVectors) {
     VectorT v{VectorT{1, 2, 3}, VectorT{4, 5, 6}};
 
     EXPECT_TRUE((std::is_same_v<decltype(v), VectorT<VectorT<int>>>));
@@ -638,8 +564,7 @@ TEST(DeductionGuides, NestedVectors)
     EXPECT_EQ(v[1].size(), 3UL);
 }
 
-TEST(DeductionGuides, SingleElement)
-{
+TEST(DeductionGuides, SingleElement) {
     VectorT v{3.14};
 
     EXPECT_TRUE((std::is_same_v<decltype(v), VectorT<double>>));

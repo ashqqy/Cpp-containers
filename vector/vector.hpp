@@ -7,12 +7,10 @@
 #include "iterator.hpp"
 #include "vector_bool.hpp"
 
-namespace containers
-{
+namespace containers {
 
 template <typename T>
-class Vector
-{
+class Vector {
   public:
     using value_type = T;
 
@@ -24,36 +22,26 @@ class Vector
     Vector() = default;
 
     Vector(std::size_t size, value_type value = value_type{})
-        : size_(size), capacity_(size), buffer_(allocate_and_safe_fill(size, value))
-    {
-    }
+        : size_(size), capacity_(size), buffer_(allocate_and_safe_fill(size, value)) {}
 
     Vector(std::initializer_list<value_type> init)
         : size_(init.size()), capacity_(size_),
-          buffer_(allocate_and_safe_copy(init.begin(), init.end()))
-    {
-    }
+          buffer_(allocate_and_safe_copy(init.begin(), init.end())) {}
 
     Vector(const value_type* begin, const value_type* end)
-        : size_(end - begin), capacity_(size_), buffer_(allocate_and_safe_copy(begin, end))
-    {
-    }
+        : size_(end - begin), capacity_(size_), buffer_(allocate_and_safe_copy(begin, end)) {}
 
   public: // rule of five
     ~Vector() { deallocate(data()); }
 
     Vector(const Vector& vector)
         : size_(vector.size()), capacity_(vector.capacity()),
-          buffer_(allocate_and_safe_copy(vector.data(), vector.data() + vector.size()))
-    {
-    }
+          buffer_(allocate_and_safe_copy(vector.data(), vector.data() + vector.size())) {}
 
     Vector(Vector&& other) { swap(other); }
 
-    Vector& operator=(const Vector& vector)
-    {
-        if (this != std::addressof(vector))
-        {
+    Vector& operator=(const Vector& vector) {
+        if (this != std::addressof(vector)) {
             Vector temp(vector);
             swap(temp);
         }
@@ -61,36 +49,26 @@ class Vector
         return *this;
     }
 
-    Vector& operator=(Vector&& vector)
-    {
-        if (this != std::addressof(vector))
-        {
-            swap(vector);
-        }
+    Vector& operator=(Vector&& vector) {
+        if (this != std::addressof(vector)) { swap(vector); }
 
         return *this;
     }
 
   public: // comparison
     auto operator<=>(const Vector& other) const
-        noexcept(noexcept(std::declval<const T&>() <=> std::declval<const T&>()))
-    {
+        noexcept(noexcept(std::declval<const T&>() <=> std::declval<const T&>())) {
         return std::lexicographical_compare_three_way(data(), data() + size(), other.data(),
                                                       other.data() + other.size());
     }
 
-    bool operator==(const Vector& other) const noexcept(noexcept(*this <=> other))
-    {
-        if (size() != other.size())
-        {
-            return false;
-        }
+    bool operator==(const Vector& other) const noexcept(noexcept(*this <=> other)) {
+        if (size() != other.size()) { return false; }
 
         return (*this <=> other) == 0;
     }
 
-    bool equal_to(const Vector& other) const noexcept(noexcept(*this == other))
-    {
+    bool equal_to(const Vector& other) const noexcept(noexcept(*this == other)) {
         return *this == other;
     }
 
@@ -99,20 +77,12 @@ class Vector
 
     const value_type& operator[](std::size_t idx) const noexcept { return buffer_[idx]; }
 
-    value_type& at(std::size_t idx)
-    {
-        if (idx >= size())
-        {
-            throw std::out_of_range("Vector::at");
-        }
+    value_type& at(std::size_t idx) {
+        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
         return buffer_[idx];
     }
-    const value_type& at(std::size_t idx) const
-    {
-        if (idx >= size())
-        {
-            throw std::out_of_range("Vector::at");
-        }
+    const value_type& at(std::size_t idx) const {
+        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
         return buffer_[idx];
     }
 
@@ -132,29 +102,19 @@ class Vector
 
     std::size_t capacity() const noexcept { return capacity_; }
 
-    void reserve(std::size_t new_cap)
-    {
-        if (new_cap > capacity())
-        {
-            reallocate(new_cap);
-        }
+    void reserve(std::size_t new_cap) {
+        if (new_cap > capacity()) { reallocate(new_cap); }
     }
 
-    void shrink_to_fit()
-    {
-        if (capacity() > size())
-        {
-            reallocate(size());
-        }
+    void shrink_to_fit() {
+        if (capacity() > size()) { reallocate(size()); }
     }
 
   public: // modifiers
     void clear() noexcept { size_ = 0; }
 
-    void push_back(const value_type& value)
-    {
-        if (size_out_of_range())
-        {
+    void push_back(const value_type& value) {
+        if (size_out_of_range()) {
             Vector temp(doubled_capacity());
             copy(data(), data() + size(), temp.data());
             temp.size_ = size();
@@ -167,33 +127,22 @@ class Vector
         ++size_;
     }
 
-    void pop_back() noexcept
-    {
-        if (!empty())
-        {
-            --size_;
-        }
+    void pop_back() noexcept {
+        if (!empty()) { --size_; }
     }
 
-    void resize(std::size_t new_size, value_type value = value_type{})
-    {
-        if (new_size < size())
-        {
+    void resize(std::size_t new_size, value_type value = value_type{}) {
+        if (new_size < size()) {
             size_ = new_size;
-        }
-        else if (new_size < capacity())
-        {
+        } else if (new_size < capacity()) {
             fill(data() + size(), data() + new_size, value);
             size_ = new_size;
-        }
-        else
-        {
+        } else {
             reallocate_and_fill(new_size, value);
         }
     }
 
-    void swap(Vector& other) noexcept
-    {
+    void swap(Vector& other) noexcept {
         std::swap(size_, other.size_);
         std::swap(capacity_, other.capacity_);
         std::swap(buffer_, other.buffer_);
@@ -203,17 +152,12 @@ class Vector
     static value_type* allocate(std::size_t size) { return new value_type[size]; }
     static void deallocate(value_type* buffer) noexcept { delete[] buffer; }
 
-    void reallocate(std::size_t new_cap)
-    {
-        if (new_cap == capacity())
-        {
-            return;
-        }
+    void reallocate(std::size_t new_cap) {
+        if (new_cap == capacity()) { return; }
 
         value_type* new_buffer = allocate(new_cap);
 
-        if (data() != nullptr)
-        {
+        if (data() != nullptr) {
             std::size_t to_copy = std::min(size(), new_cap);
             copy(data(), data() + to_copy, new_buffer);
             deallocate(data());
@@ -223,49 +167,38 @@ class Vector
         capacity_ = new_cap;
     }
 
-    void reallocate_and_fill(std::size_t new_cap, const value_type& value)
-    {
+    void reallocate_and_fill(std::size_t new_cap, const value_type& value) {
         Vector temp(new_cap);
         copy(data(), data() + size(), temp.data());
 
         value_type* first = temp.data() + size();
         value_type* last = temp.data() + new_cap;
 
-        if (last > first)
-        {
-            fill(first, last, value);
-        }
+        if (last > first) { fill(first, last, value); }
 
         swap(temp);
     }
 
     bool size_out_of_range() const noexcept { return size() >= capacity(); }
 
-    std::size_t doubled_capacity() const noexcept
-    {
+    std::size_t doubled_capacity() const noexcept {
         return std::max(capacity() * kCapacityMultiplier, kMinCapacity);
     }
 
-    static void fill(value_type* begin, value_type* end, const value_type& value)
-    {
+    static void fill(value_type* begin, value_type* end, const value_type& value) {
         std::fill(begin, end, value);
     }
 
-    static void copy(const value_type* begin, const value_type* end, value_type* result)
-    {
+    static void copy(const value_type* begin, const value_type* end, value_type* result) {
         std::copy(begin, end, result);
     }
 
-    static T* allocate_and_safe_fill(std::size_t size, const value_type& value)
-    {
+    static T* allocate_and_safe_fill(std::size_t size, const value_type& value) {
         T* dst = allocate(size);
 
-        try
-        {
+        try {
             fill(dst, dst + size, value);
-        }
-        catch (...)
-        {
+        } catch (...) {
             deallocate(dst);
             throw;
         }
@@ -273,15 +206,11 @@ class Vector
         return dst;
     }
 
-    static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end)
-    {
+    static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end) {
         T* result = allocate(end - begin);
-        try
-        {
+        try {
             copy(begin, end, result);
-        }
-        catch (...)
-        {
+        } catch (...) {
             deallocate(result);
             throw;
         }

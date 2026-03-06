@@ -2,40 +2,34 @@
 
 #include <gtest/gtest.h>
 
-#include "signature.hpp"
 #include "common.hpp"
+#include "signature.hpp"
 
 using VectorInt = signature::VectorInt;
 
-TEST(Constructors, Default)
-{
+TEST(Constructors, Default) {
     VectorInt vector;
     ASSERT_EQ(vector.size(), 0UL);
     ASSERT_TRUE(vector.empty());
 }
 
-TEST(Constructors, FromSize)
-{
+TEST(Constructors, FromSize) {
     size_t size = 100;
     VectorInt vector(size);
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         ASSERT_EQ(vector.at(i), 0);
     }
 }
 
-TEST(Constructors, FromSizeAndValue)
-{
+TEST(Constructors, FromSizeAndValue) {
     size_t size = 100;
     VectorInt vector(size, 10);
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         ASSERT_EQ(vector.at(i), 10);
     }
 }
 
-TEST(Constructors, FromStaticArray)
-{
+TEST(Constructors, FromStaticArray) {
     int arr[] = {1, 2, 3};
     VectorInt vector(arr, arr + 3);
 
@@ -44,20 +38,17 @@ TEST(Constructors, FromStaticArray)
     ASSERT_EQ(vector.at(2), 3);
 }
 
-TEST(Constructors, CopyConstructor)
-{
+TEST(Constructors, CopyConstructor) {
     size_t size = 100;
     VectorInt vector(size, 10);
     VectorInt other(vector);
 
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         ASSERT_EQ(vector.at(i), other.at(i));
     }
 }
 
-TEST(Clear, Clear)
-{
+TEST(Clear, Clear) {
     size_t size = 100;
     VectorInt vector(size, 10);
     vector.clear();
@@ -66,8 +57,7 @@ TEST(Clear, Clear)
     ASSERT_TRUE(vector.empty());
 }
 
-TEST(PopBack, FromNonEmpty)
-{
+TEST(PopBack, FromNonEmpty) {
     int arr[] = {0, 1};
     VectorInt vector(arr, arr + 2);
 
@@ -78,8 +68,7 @@ TEST(PopBack, FromNonEmpty)
     ASSERT_EQ(vector.size(), 0UL);
 }
 
-TEST(Resize, ToLess)
-{
+TEST(Resize, ToLess) {
     int arr[] = {0, 1, 2, 3, 4, 5, 6};
     VectorInt vector(arr, arr + 7);
     vector.resize(3);
@@ -88,8 +77,7 @@ TEST(Resize, ToLess)
     ASSERT_EQ(vector.at(2), 2);
 }
 
-TEST(Resize, ToBigger)
-{
+TEST(Resize, ToBigger) {
     int arr[] = {0, 1};
     VectorInt vector(arr, arr + 2);
     vector.resize(10);
@@ -98,8 +86,7 @@ TEST(Resize, ToBigger)
     ASSERT_EQ(vector.at(7), 0);
 }
 
-TEST(Resize, ToZero)
-{
+TEST(Resize, ToZero) {
     int arr[] = {0, 1};
     VectorInt vector(arr, arr + 2);
     vector.resize(0);
@@ -107,8 +94,7 @@ TEST(Resize, ToZero)
     EXPECT_TRUE(vector.empty());
 }
 
-TEST(Resize, ToBiggerWithVal)
-{
+TEST(Resize, ToBiggerWithVal) {
     int arr[] = {0, 1};
     VectorInt vector(arr, arr + 2);
     vector.resize(10, 20);
@@ -119,8 +105,7 @@ TEST(Resize, ToBiggerWithVal)
     ASSERT_EQ(vector.at(9), 20);
 }
 
-TEST(Reserve, ToLess)
-{
+TEST(Reserve, ToLess) {
     int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     VectorInt vector(arr, arr + 10);
 
@@ -131,8 +116,7 @@ TEST(Reserve, ToLess)
     ASSERT_LE(vector.capacity(), vector.size() * 2);
 }
 
-TEST(Reserve, ToBigger)
-{
+TEST(Reserve, ToBigger) {
     int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     VectorInt vector(arr, arr + 10);
     vector.reserve(100);
@@ -143,8 +127,7 @@ TEST(Reserve, ToBigger)
     ASSERT_LE(vector.capacity(), vector.size() * 2);
 }
 
-TEST(ShrinkToFit, ShrinkToFit)
-{
+TEST(ShrinkToFit, ShrinkToFit) {
     int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     VectorInt vector(arr, arr + 10);
     vector.shrink_to_fit();
@@ -154,8 +137,7 @@ TEST(ShrinkToFit, ShrinkToFit)
     ASSERT_EQ(vector.size(), 10UL);
 }
 
-TEST(Swap, Two)
-{
+TEST(Swap, Two) {
     int arr[] = {0, 0, 1, 0, 0};
     VectorInt first(arr, arr + 5);
     int brr[] = {0, 0, 2, 0, 0};
@@ -167,8 +149,7 @@ TEST(Swap, Two)
     ASSERT_EQ(second.at(2), 1);
 }
 
-TEST(Swap, One)
-{
+TEST(Swap, One) {
     int arr[] = {0, 0, 1, 0, 0};
     VectorInt vector(arr, arr + 5);
     vector.swap(vector);
@@ -177,8 +158,7 @@ TEST(Swap, One)
     ASSERT_EQ(vector.at(2), 1);
 }
 
-TEST(At, NonConst)
-{
+TEST(At, NonConst) {
     int arr[] = {0, 0, 1, 0, 0};
     VectorInt vector(arr, arr + 5);
 
@@ -190,8 +170,7 @@ TEST(At, NonConst)
     EXPECT_TRUE(is_int);
 }
 
-TEST(At, Const)
-{
+TEST(At, Const) {
     int arr[] = {0, 0, 1, 0, 0};
     const VectorInt vector(arr, arr + 5);
 
@@ -202,8 +181,7 @@ TEST(At, Const)
     EXPECT_TRUE(is_const_ref || is_not_ref);
 }
 
-TEST(FrontBack, Const)
-{
+TEST(FrontBack, Const) {
     int arr[] = {10, 0, 1, 0, 20};
     const VectorInt vector(arr, arr + 5);
 
@@ -222,8 +200,7 @@ TEST(FrontBack, Const)
     EXPECT_EQ(vector.back(), 20);
 }
 
-TEST(FrontBack, NonConst)
-{
+TEST(FrontBack, NonConst) {
     int arr[] = {10, 0, 1, 0, 20};
     VectorInt vector(arr, arr + 5);
 
@@ -242,8 +219,7 @@ TEST(FrontBack, NonConst)
     EXPECT_EQ(vector.at(vector.size() - 1), 25);
 }
 
-TEST(Data, NonConst)
-{
+TEST(Data, NonConst) {
     int arr[] = {10, 0, 1, 0, 20};
     VectorInt vector(arr, arr + 5);
     bool are_same = std::is_same_v<decltype(vector.data()), int*>;
@@ -251,8 +227,7 @@ TEST(Data, NonConst)
     EXPECT_TRUE(are_same);
 }
 
-TEST(Data, Const)
-{
+TEST(Data, Const) {
     int arr[] = {10, 0, 1, 0, 20};
     const VectorInt vector(arr, arr + 5);
     bool are_same = std::is_same_v<decltype(vector.data()), const int*>;
@@ -260,8 +235,7 @@ TEST(Data, Const)
     EXPECT_TRUE(are_same);
 }
 
-TEST(Compare, Equal)
-{
+TEST(Compare, Equal) {
     int arr[] = {10, 0, 1, 0, 20};
     VectorInt v1(arr, arr + 5);
     VectorInt v2(arr, arr + 5);
@@ -269,8 +243,7 @@ TEST(Compare, Equal)
     ASSERT_TRUE(v1.equal_to(v2));
 }
 
-TEST(Compare, NotEqual)
-{
+TEST(Compare, NotEqual) {
     int arr[] = {10, 0, 1, 0, 20};
     VectorInt v1(arr, arr + 5);
     int brr[] = {10, 0, 2, 0, 20};
@@ -279,8 +252,7 @@ TEST(Compare, NotEqual)
     ASSERT_FALSE(v1.equal_to(v2));
 }
 
-TEST(Compare, NotEqualDiffLen)
-{
+TEST(Compare, NotEqualDiffLen) {
     int arr[] = {10, 0, 1, 0, 20};
     VectorInt v1(arr, arr + 5);
     int brr[] = {10, 0, 1, 0};
@@ -292,8 +264,7 @@ TEST(Compare, NotEqualDiffLen)
     ASSERT_FALSE(v1.equal_to(v3));
 }
 
-TEST(PushBack, ToExisting)
-{
+TEST(PushBack, ToExisting) {
     int arr[] = {0, 1, 2};
     VectorInt vector(arr, arr + 3);
     vector.push_back(4);
@@ -301,22 +272,19 @@ TEST(PushBack, ToExisting)
     ASSERT_EQ(vector.size(), 4UL);
 }
 
-TEST(PushBack, ToDefault)
-{
+TEST(PushBack, ToDefault) {
     VectorInt vector;
     vector.push_back(1);
 
     ASSERT_EQ(vector.size(), 1UL);
 }
 
-TEST(PushBack, Random)
-{
+TEST(PushBack, Random) {
     size_t iterations_count = 1 << 20;
     auto data = GenerateRandomInts(iterations_count, -100, 100);
 
     VectorInt real;
-    for (int elem : data)
-    {
+    for (int elem : data) {
         real.push_back(elem);
     }
 
