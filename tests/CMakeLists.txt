@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.18)
-
 project(tests LANGUAGES CXX)
 
 include(${CMAKE_SOURCE_DIR}/cmake/add_container_test.cmake)

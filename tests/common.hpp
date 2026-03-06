@@ -26,7 +26,7 @@ std::chrono::duration<double, std::milli> MeasureTime(F&& func, std::size_t iter
     return total / static_cast<double>(iterations);
 }
 
-std::vector<int> GenerateRandomInts(std::size_t n, int from, int to) {
+inline std::vector<int> GenerateRandomInts(std::size_t n, int from, int to) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distrib(from, to);
@@ -39,4 +39,12 @@ std::vector<int> GenerateRandomInts(std::size_t n, int from, int to) {
     }
 
     return data;
+}
+
+inline int GenerateRandomInt(int from, int to) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distrib(from, to);
+
+    return distrib(gen);
 }
