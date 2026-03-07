@@ -37,15 +37,15 @@ class Vector : private VectorBuffer<T> {
     }
 
     template <std::forward_iterator FwdIter>
-    Vector(FwdIter begin, FwdIter end) : VectorBuffer<value_type>(end - begin) {
+    Vector(FwdIter begin, FwdIter end) : VectorBuffer<value_type>(std::distance(begin, end)) {
         construct_from_range(begin, end);
     }
 
     ~Vector() = default;
 
   private:
-    template <std::forward_iterator FwdIter>
-    Vector(std::size_t capacity, FwdIter begin, FwdIter end) : VectorBuffer<value_type>(capacity) {
+    template <std::input_iterator InputIter>
+    Vector(std::size_t capacity, InputIter begin, InputIter end) : VectorBuffer<value_type>(capacity) {
         construct_from_range(begin, end);
     }
 
@@ -103,24 +103,24 @@ class Vector : private VectorBuffer<T> {
     const_reverse_iterator crend() const noexcept { return rend(); }
 
   public: // element access
-    value_type& operator[](std::size_t idx) noexcept { return buffer_[idx]; }
+    value_type& operator[](std::size_t idx) noexcept { return data()[idx]; }
 
-    const value_type& operator[](std::size_t idx) const noexcept { return buffer_[idx]; }
+    const value_type& operator[](std::size_t idx) const noexcept { return data()[idx]; }
 
     value_type& at(std::size_t idx) {
         if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
-        return buffer_[idx];
+        return data()[idx];
     }
     const value_type& at(std::size_t idx) const {
         if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
-        return buffer_[idx];
+        return data()[idx];
     }
 
-    value_type& front() noexcept { return (*this)[0]; }
-    const value_type& front() const noexcept { return (*this)[0]; }
+    value_type& front() noexcept { return data()[0]; }
+    const value_type& front() const noexcept { return data()[0]; }
 
-    value_type& back() noexcept { return (*this)[size() - 1]; }
-    const value_type& back() const noexcept { return (*this)[size() - 1]; }
+    value_type& back() noexcept { return data()[size() - 1]; }
+    const value_type& back() const noexcept { return data()[size() - 1]; }
 
     value_type* data() noexcept { return buffer_; }
     const value_type* data() const noexcept { return buffer_; }
@@ -171,7 +171,7 @@ class Vector : private VectorBuffer<T> {
         if (new_size < size()) {
             destroy(begin() + new_size, end());
             size_ = new_size;
-        } else if (new_size < capacity()) {
+        } else if (new_size <= capacity()) {
             construct_from_value(new_size, value);
         } else {
             reallocate(new_size, value);
@@ -195,11 +195,10 @@ class Vector : private VectorBuffer<T> {
         }
     }
 
-    template <std::forward_iterator FwdIter>
-    void construct_from_range(FwdIter begin, FwdIter end) {
-        std::size_t dist = end - begin;
-        for (std::size_t i = size(); i < dist; ++i, ++begin) {
-            construct(data() + i, *begin);
+    template <std::input_iterator InputIter>
+    void construct_from_range(InputIter begin, InputIter end) {
+        for (; begin != end; ++begin) {
+            construct(data() + size(), *begin);
             ++size_;
         }
     }
@@ -222,10 +221,14 @@ class Vector : private VectorBuffer<T> {
     }
 
     Vector reallocate_impl(std::size_t new_cap) {
-        std::size_t to_copy = std::min(size(), new_cap);
-        Vector temp(new_cap, begin(), begin() + to_copy);
+        std::size_t to_transfer = std::min(size(), new_cap);
 
-        return temp;
+        if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+            return Vector(new_cap, std::make_move_iterator(begin()),
+                          std::make_move_iterator(begin() + to_transfer));
+        } else {
+            return Vector(new_cap, begin(), begin() + to_transfer);
+        }
     }
 
     bool size_out_of_range() const noexcept { return size() >= capacity(); }

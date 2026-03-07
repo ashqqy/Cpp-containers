@@ -5,7 +5,7 @@ class VectorBuffer {
   protected:
     VectorBuffer() = default;
 
-    VectorBuffer(std::size_t size) : buffer_(allocate(size)), capacity_(size) {}
+    VectorBuffer(std::size_t capacity) : buffer_(allocate(capacity)), capacity_(capacity) {}
 
     ~VectorBuffer() {
         destroy(buffer_, buffer_ + size_);
