@@ -10,6 +10,8 @@
 #include "test_throwing_methods.hpp"
 #include "test_throwing_type.hpp"
 #include "test_throwing_allocation.hpp"
+
+#include "test_move_optimization.hpp"
 // clang-format on
 
 int main(int argc, char** argv) {
