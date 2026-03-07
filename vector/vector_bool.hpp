@@ -71,8 +71,10 @@ class Vector<bool> {
     using value_type = bool;
 
   private:
-    static inline std::size_t kCapacityMultiplier = 2;
-    static inline std::size_t kMinCapacity = 1;
+    static constexpr std::size_t kCapacityMultiplier = 2;
+    static constexpr std::size_t kMinCapacity = 1;
+
+    static constexpr const char* kAtExceptionMessage = "Vector::at";
 
   public: // constructors
     Vector() = default;
@@ -100,7 +102,7 @@ class Vector<bool> {
         std::copy(vector.buffer_, vector.buffer_ + details::bits_to_bytes(vector.size()), buffer_);
     }
 
-    Vector(Vector&& other) { swap(other); }
+    Vector(Vector&& other) noexcept { swap(other); }
 
     Vector& operator=(const Vector& vector) {
         if (this != std::addressof(vector)) {
@@ -110,7 +112,7 @@ class Vector<bool> {
         return *this;
     }
 
-    Vector& operator=(Vector&& vector) {
+    Vector& operator=(Vector&& vector) noexcept {
         if (this != std::addressof(vector)) { swap(vector); }
 
         return *this;
@@ -146,11 +148,11 @@ class Vector<bool> {
     }
 
     bool at(std::size_t idx) const {
-        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
+        if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
         return (*this)[idx];
     }
     details::BitRef at(std::size_t idx) {
-        if (idx >= size()) { throw std::out_of_range("Vector::at"); }
+        if (idx >= size()) { throw std::out_of_range(kAtExceptionMessage); }
         return (*this)[idx];
     }
 

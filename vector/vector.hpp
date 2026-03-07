@@ -24,7 +24,7 @@ class Vector {
 
     static constexpr const char* kAtExceptionMessage = "Vector::at";
 
-  public: // constructors
+  public: // constructors and destructor
     Vector() = default;
 
     Vector(std::size_t size, value_type value = value_type{})
@@ -37,14 +37,14 @@ class Vector {
     Vector(const value_type* begin, const value_type* end)
         : size_(end - begin), capacity_(size_), buffer_(allocate_and_safe_copy(begin, end)) {}
 
-  public: // rule of five
     ~Vector() { deallocate(data()); }
 
+  public: // copy and move
     Vector(const Vector& vector)
         : size_(vector.size()), capacity_(vector.capacity()),
           buffer_(allocate_and_safe_copy(vector.data(), vector.data() + vector.size())) {}
 
-    Vector(Vector&& other) { swap(other); }
+    Vector(Vector&& other) noexcept { swap(other); }
 
     Vector& operator=(const Vector& vector) {
         if (this != std::addressof(vector)) {
@@ -55,7 +55,7 @@ class Vector {
         return *this;
     }
 
-    Vector& operator=(Vector&& vector) {
+    Vector& operator=(Vector&& vector) noexcept {
         if (this != std::addressof(vector)) { swap(vector); }
 
         return *this;
@@ -142,6 +142,7 @@ class Vector {
             copy(data(), data() + size(), temp.data());
             temp.size_ = size();
             temp.push_back(value);
+
             swap(temp);
             return;
         }
@@ -175,6 +176,40 @@ class Vector {
     static value_type* allocate(std::size_t size) { return new value_type[size]; }
     static void deallocate(value_type* buffer) noexcept { delete[] buffer; }
 
+    static void fill(value_type* begin, value_type* end, const value_type& value) {
+        std::fill(begin, end, value);
+    }
+
+    static void copy(const value_type* begin, const value_type* end, value_type* result) {
+        std::copy(begin, end, result);
+    }
+
+    static T* allocate_and_safe_fill(std::size_t size, const value_type& value) {
+        T* dst = allocate(size);
+
+        try {
+            fill(dst, dst + size, value);
+        } catch (...) {
+            deallocate(dst);
+            throw;
+        }
+
+        return dst;
+    }
+
+    static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end) {
+        T* result = allocate(end - begin);
+
+        try {
+            copy(begin, end, result);
+        } catch (...) {
+            deallocate(result);
+            throw;
+        }
+
+        return result;
+    }
+
     void reallocate(std::size_t new_cap) {
         if (new_cap == capacity()) { return; }
 
@@ -206,39 +241,6 @@ class Vector {
 
     std::size_t doubled_capacity() const noexcept {
         return std::max(capacity() * kCapacityMultiplier, kMinCapacity);
-    }
-
-    static void fill(value_type* begin, value_type* end, const value_type& value) {
-        std::fill(begin, end, value);
-    }
-
-    static void copy(const value_type* begin, const value_type* end, value_type* result) {
-        std::copy(begin, end, result);
-    }
-
-    static T* allocate_and_safe_fill(std::size_t size, const value_type& value) {
-        T* dst = allocate(size);
-
-        try {
-            fill(dst, dst + size, value);
-        } catch (...) {
-            deallocate(dst);
-            throw;
-        }
-
-        return dst;
-    }
-
-    static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end) {
-        T* result = allocate(end - begin);
-
-        try {
-            copy(begin, end, result);
-        } catch (...) {
-            deallocate(result);
-            throw;
-        }
-        return result;
     }
 
   private:
