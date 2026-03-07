@@ -34,17 +34,18 @@ class VectorBuffer {
   protected:
     static T* allocate(std::size_t size) {
         T* mem = nullptr;
-        if (size != 0) { mem = ::operator new(size * sizeof(T)) }
+        if (size != 0) { mem = static_cast<T*>(::operator new(size * sizeof(T))); }
         return mem;
     }
 
     static void deallocate(T* buffer) noexcept { ::operator delete(buffer); }
 
-    static void construct(T* ptr, const T& rhs) { std::construct_at(ptr, rhs); }
+    static void construct(T* ptr, const T& value) { std::construct_at(ptr, value); }
+    static void construct(T* ptr, T&& value) { std::construct_at(ptr, std::move(value)); }
 
     static void destroy(T* ptr) noexcept { std::destroy_at(ptr); }
 
-    template <typename FwdIter>
+    template <std::forward_iterator FwdIter>
     static void destroy(FwdIter begin, FwdIter end) noexcept {
         std::destroy(begin, end);
     }

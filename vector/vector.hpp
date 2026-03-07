@@ -4,17 +4,18 @@
 #include <compare>
 #include <cstring>
 
-#include "iterator.hpp"
 #include "vector_bool.hpp"
+#include "vector_buf.hpp"
+#include "vector_iter.hpp"
 
 namespace containers {
 
 template <typename T>
-class Vector {
+class Vector : private VectorBuffer<T> {
   public:
     using value_type = T;
-    using iterator = VectorIterator<T, false>;
-    using const_iterator = VectorIterator<T, true>;
+    using iterator = VectorIterator<value_type, false>;
+    using const_iterator = VectorIterator<value_type, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -27,24 +28,33 @@ class Vector {
   public: // constructors and destructor
     Vector() = default;
 
-    Vector(std::size_t size, value_type value = value_type{})
-        : size_(size), capacity_(size), buffer_(allocate_and_safe_fill(size, value)) {}
+    Vector(std::size_t size, value_type value = value_type{}) : VectorBuffer<value_type>(size) {
+        construct_from_value(size, value);
+    }
 
-    Vector(std::initializer_list<value_type> init)
-        : size_(init.size()), capacity_(size_),
-          buffer_(allocate_and_safe_copy(init.begin(), init.end())) {}
+    Vector(std::initializer_list<value_type> init) : VectorBuffer<value_type>(init.size()) {
+        construct_from_range(init.begin(), init.end());
+    }
 
-    Vector(const value_type* begin, const value_type* end)
-        : size_(end - begin), capacity_(size_), buffer_(allocate_and_safe_copy(begin, end)) {}
+    template <std::forward_iterator FwdIter>
+    Vector(FwdIter begin, FwdIter end) : VectorBuffer<value_type>(end - begin) {
+        construct_from_range(begin, end);
+    }
 
-    ~Vector() { deallocate(data()); }
+    ~Vector() = default;
+
+  private:
+    template <std::forward_iterator FwdIter>
+    Vector(std::size_t capacity, FwdIter begin, FwdIter end) : VectorBuffer<value_type>(capacity) {
+        construct_from_range(begin, end);
+    }
 
   public: // copy and move
-    Vector(const Vector& vector)
-        : size_(vector.size()), capacity_(vector.capacity()),
-          buffer_(allocate_and_safe_copy(vector.data(), vector.data() + vector.size())) {}
+    Vector(const Vector& vector) : VectorBuffer<value_type>(vector.size()) {
+        construct_from_range(vector.begin(), vector.end());
+    }
 
-    Vector(Vector&& other) noexcept { swap(other); }
+    Vector(Vector&& other) = default;
 
     Vector& operator=(const Vector& vector) {
         if (this != std::addressof(vector)) {
@@ -55,15 +65,12 @@ class Vector {
         return *this;
     }
 
-    Vector& operator=(Vector&& vector) noexcept {
-        if (this != std::addressof(vector)) { swap(vector); }
-
-        return *this;
-    }
+    Vector& operator=(Vector&& vector) = default;
 
   public: // comparison
     auto operator<=>(const Vector& other) const
-        noexcept(noexcept(std::declval<const T&>() <=> std::declval<const T&>())) {
+        noexcept(noexcept(std::declval<const value_type&>() <=>
+                          std::declval<const value_type&>())) {
         return std::lexicographical_compare_three_way(data(), data() + size(), other.data(),
                                                       other.data() + other.size());
     }
@@ -134,35 +141,40 @@ class Vector {
     }
 
   public: // modifiers
-    void clear() noexcept { size_ = 0; }
+    void clear() noexcept {
+        destroy(begin(), end());
+        size_ = 0;
+    }
 
     void push_back(const value_type& value) {
-        if (size_out_of_range()) {
-            Vector temp(doubled_capacity());
-            copy(data(), data() + size(), temp.data());
-            temp.size_ = size();
-            temp.push_back(value);
+        if (size_out_of_range()) { reallocate(doubled_capacity()); }
 
-            swap(temp);
-            return;
-        }
+        construct(data() + size(), value);
+        ++size_;
+    }
 
-        (*this)[size()] = value;
+    void push_back(value_type&& value) {
+        if (size_out_of_range()) { reallocate(doubled_capacity()); }
+
+        construct(data() + size(), std::move(value));
         ++size_;
     }
 
     void pop_back() noexcept {
-        if (!empty()) { --size_; }
+        if (!empty()) {
+            destroy(data() + size() - 1);
+            --size_;
+        }
     }
 
     void resize(std::size_t new_size, value_type value = value_type{}) {
         if (new_size < size()) {
+            destroy(begin() + new_size, end());
             size_ = new_size;
         } else if (new_size < capacity()) {
-            fill(data() + size(), data() + new_size, value);
-            size_ = new_size;
+            construct_from_value(new_size, value);
         } else {
-            reallocate_and_fill(new_size, value);
+            reallocate(new_size, value);
         }
     }
 
@@ -173,68 +185,47 @@ class Vector {
     }
 
   private:
-    static value_type* allocate(std::size_t size) { return new value_type[size]; }
-    static void deallocate(value_type* buffer) noexcept { delete[] buffer; }
+    using VectorBuffer<value_type>::construct;
+    using VectorBuffer<value_type>::destroy;
 
-    static void fill(value_type* begin, value_type* end, const value_type& value) {
-        std::fill(begin, end, value);
-    }
-
-    static void copy(const value_type* begin, const value_type* end, value_type* result) {
-        std::copy(begin, end, result);
-    }
-
-    static T* allocate_and_safe_fill(std::size_t size, const value_type& value) {
-        T* dst = allocate(size);
-
-        try {
-            fill(dst, dst + size, value);
-        } catch (...) {
-            deallocate(dst);
-            throw;
+    void construct_from_value(size_t new_size, const value_type& value) {
+        for (std::size_t i = size(); i < new_size; ++i) {
+            construct(data() + i, value);
+            ++size_;
         }
-
-        return dst;
     }
 
-    static value_type* allocate_and_safe_copy(const value_type* begin, const value_type* end) {
-        T* result = allocate(end - begin);
-
-        try {
-            copy(begin, end, result);
-        } catch (...) {
-            deallocate(result);
-            throw;
+    template <std::forward_iterator FwdIter>
+    void construct_from_range(FwdIter begin, FwdIter end) {
+        std::size_t dist = end - begin;
+        for (std::size_t i = size(); i < dist; ++i, ++begin) {
+            construct(data() + i, *begin);
+            ++size_;
         }
-
-        return result;
     }
 
     void reallocate(std::size_t new_cap) {
         if (new_cap == capacity()) { return; }
 
-        value_type* new_buffer = allocate(new_cap);
-
-        if (data() != nullptr) {
-            std::size_t to_copy = std::min(size(), new_cap);
-            copy(data(), data() + to_copy, new_buffer);
-            deallocate(data());
-        }
-
-        buffer_ = new_buffer;
-        capacity_ = new_cap;
-    }
-
-    void reallocate_and_fill(std::size_t new_cap, const value_type& value) {
-        Vector temp(new_cap);
-        copy(data(), data() + size(), temp.data());
-
-        value_type* first = temp.data() + size();
-        value_type* last = temp.data() + new_cap;
-
-        if (last > first) { fill(first, last, value); }
+        Vector temp = reallocate_impl(new_cap);
 
         swap(temp);
+    }
+
+    void reallocate(std::size_t new_cap, const value_type& value) {
+        if (new_cap == capacity()) { return; }
+
+        Vector temp = reallocate_impl(new_cap);
+        temp.construct_from_value(new_cap, value);
+
+        swap(temp);
+    }
+
+    Vector reallocate_impl(std::size_t new_cap) {
+        std::size_t to_copy = std::min(size(), new_cap);
+        Vector temp(new_cap, begin(), begin() + to_copy);
+
+        return temp;
     }
 
     bool size_out_of_range() const noexcept { return size() >= capacity(); }
@@ -244,9 +235,9 @@ class Vector {
     }
 
   private:
-    std::size_t size_ = 0;
-    std::size_t capacity_ = 0;
-    value_type* buffer_ = nullptr;
+    using VectorBuffer<value_type>::buffer_;
+    using VectorBuffer<value_type>::capacity_;
+    using VectorBuffer<value_type>::size_;
 };
 
 } // namespace containers
