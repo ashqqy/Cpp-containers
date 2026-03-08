@@ -2,20 +2,23 @@
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 template <typename T, bool IsConst = false>
 class VectorIterator {
-  public:
-    using element_type = std::conditional_t<IsConst, const T, T>;
+  private:
+    template <typename U>
+    using maybe_const = std::conditional_t<IsConst, const U, U>;
 
-    using iterator_tag = std::random_access_iterator_tag;
+  public:
+    using iterator_category = std::random_access_iterator_tag;
     using value_type = T;
     using difference_type = std::ptrdiff_t;
-    using pointer = element_type*;
-    using reference = element_type&;
+    using pointer = maybe_const<T>*;
+    using reference = maybe_const<T>&;
 
   public:
-    VectorIterator() noexcept = default;
+    VectorIterator() = default;
     explicit VectorIterator(pointer ptr) noexcept : ptr_(ptr) {}
 
     template <bool IsOtherConst>
